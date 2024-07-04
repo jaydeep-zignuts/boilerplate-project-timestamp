@@ -2,31 +2,61 @@
 // where your node app starts
 
 // init project
-var express = require('express');
+var express = require("express");
 var app = express();
 
 // enable CORS (https://en.wikipedia.org/wiki/Cross-origin_resource_sharing)
-// so that your API is remotely testable by FCC 
-var cors = require('cors');
-app.use(cors({optionsSuccessStatus: 200}));  // some legacy browsers choke on 204
+// so that your API is remotely testable by FCC
+var cors = require("cors");
+app.use(cors({ optionsSuccessStatus: 200 })); // some legacy browsers choke on 204
 
 // http://expressjs.com/en/starter/static-files.html
-app.use(express.static('public'));
+app.use(express.static("public"));
 
 // http://expressjs.com/en/starter/basic-routing.html
 app.get("/", function (req, res) {
-  res.sendFile(__dirname + '/views/index.html');
+  res.sendFile(__dirname + "/views/index.html");
 });
 
-
-// your first API endpoint... 
+// your first API endpoint...
 app.get("/api/hello", function (req, res) {
-  res.json({greeting: 'hello API'});
+  res.json({ greeting: "hello API" });
 });
 
+app.get("/api/:date", (req, res) => {
+  let date = req.params.date;
+  let newDate = "";
+  if (isFinite(date)) {
+    newDate = new Date(Number(date)).toUTCString();
+  } else {
+    newDate = new Date(date).toUTCString();
+  }
+  console.log(newDate, date);
+  if (newDate == "Invalid Date") {
+    return res.json({ error: "Invalid Date" });
+  }
 
+  if (isFinite(date) && newDate) {
+    return res.json({
+      unix: Number(new Date(newDate).getTime()),
+      utc: newDate,
+    });
+  } else if (date && newDate) {
+    return res.json({
+      unix: Number(new Date(newDate).getTime()),
+      utc: newDate,
+    });
+  }
+});
 
-// Listen on port set in environment variable or default to 3000
+//
+app.get("/api/", (req, res) => {
+  return res.json({
+    unix: Number(new Date().getTime()),
+    utc: new Date().getTime(),
+  });
+});
+// // // Listen on port set in environment variable or default to 3000
 var listener = app.listen(process.env.PORT || 3000, function () {
-  console.log('Your app is listening on port ' + listener.address().port);
+  console.log("Your app is listening on port " + listener.address().port);
 });
